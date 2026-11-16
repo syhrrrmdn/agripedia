@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export default function AuthModal({ reason, initialView = 'login', onSuccess, onClose }) {
+export default function AuthModal({ reason, initialView = 'login', allowRegister = true, onSuccess, onClose }) {
   const [view, setView] = useState(initialView);
 
   return (
@@ -25,7 +25,11 @@ export default function AuthModal({ reason, initialView = 'login', onSuccess, on
         </div>
 
         {view === 'login' ? (
-          <LoginForm onSuccess={onSuccess} onForgot={() => setView('forgot')} onRegister={() => setView('register')} />
+          <LoginForm
+            onSuccess={onSuccess}
+            onForgot={() => setView('forgot')}
+            onRegister={allowRegister ? () => setView('register') : null}
+          />
         ) : view === 'register' ? (
           <RegisterForm
             onSuccess={onSuccess}
@@ -120,12 +124,14 @@ function LoginForm({ onSuccess, onForgot, onRegister }) {
         {busy ? 'Memproses...' : 'Masuk'}
       </button>
 
-      <p className="auth-switch">
-        Belum punya akun?{' '}
-        <button type="button" className="auth-link inline" onClick={onRegister}>
-          Daftar di sini
-        </button>
-      </p>
+      {onRegister ? (
+        <p className="auth-switch">
+          Belum punya akun?{' '}
+          <button type="button" className="auth-link inline" onClick={onRegister}>
+            Daftar di sini
+          </button>
+        </p>
+      ) : null}
     </form>
   );
 }

@@ -13,6 +13,7 @@ export default function Footer({ onNavigate }) {
           </div>
           <div>
             <h4>Menu</h4>
+            <a onClick={() => onNavigate('landing')}>Beranda</a>
             <a onClick={() => onNavigate('catalog')}>Katalog</a>
             <a onClick={() => onNavigate('education')}>Edukasi</a>
             <a onClick={() => onNavigate('dashboard')}>Dashboard</a>

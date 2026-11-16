@@ -1,6 +1,7 @@
 import { roleLabel } from '@/lib/roles';
 
 const MENU = [
+  ['landing', 'Beranda'],
   ['catalog', 'Katalog'],
   ['education', 'Edukasi'],
   ['dashboard', 'Dashboard'],
@@ -19,9 +20,9 @@ export default function Topbar({ view, user, onNavigate, onLogin, onLogout }) {
   return (
     <header className="topbar">
       <div className="shell nav">
-        <div className="brand">
+        <button type="button" className="brand brand-btn" onClick={() => onNavigate('landing')} aria-label="Kembali ke beranda">
           agri<b>pedia</b>
-        </div>
+        </button>
         <nav className="navlinks" aria-label="Navigasi utama">
           {MENU.map(([key, label]) => (
             <button

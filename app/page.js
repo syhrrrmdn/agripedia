@@ -26,13 +26,14 @@ import EducationView from '@/components/EducationView';
 import Footer from '@/components/Footer';
 import GuideModal from '@/components/GuideModal';
 import AuthModal from '@/components/AuthModal';
+import LandingView from '@/components/LandingView';
 import OrderModal from '@/components/OrderModal';
 import ProductModal from '@/components/ProductModal';
 import ReadModal from '@/components/ReadModal';
 import Topbar from '@/components/Topbar';
 
 export default function Page() {
-  const [view, setView] = useState('catalog');
+  const [view, setView] = useState('landing');
   const [products, setProducts] = useState([]);
   const [guides, setGuides] = useState([]);
   const [waNumber, setWaNumber] = useState('');
@@ -219,6 +220,14 @@ export default function Page() {
     scrollToCatalog();
   };
 
+  /** Dari landing page: buka halaman katalog pada kategori tertentu. */
+  const bukaKatalog = useCallback((kategoriNilai) => {
+    setKategori(kategoriNilai ?? 'Semua');
+    setSearch('');
+    setView('catalog');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   /* ---- Produk ---- */
 
   const saveProduct = async (values) => {
@@ -380,6 +389,19 @@ export default function Page() {
       />
 
       <main className="shell">
+        {view === 'landing' ? (
+          <LandingView
+            stats={homeStats}
+            user={user}
+            products={products}
+            onExplore={bukaKatalog}
+            onEducation={() => navigate('education')}
+            onOrder={openOrder}
+            onLogin={() => openLogin('Masuk ke akun AgriPedia Anda.')}
+            onDashboard={() => navigate('dashboard')}
+          />
+        ) : null}
+
         {view === 'catalog' ? (
           <CatalogView
             stats={homeStats}
@@ -475,6 +497,7 @@ export default function Page() {
         <AuthModal
           reason={loginPrompt.reason}
           initialView={loginPrompt.initialView ?? 'login'}
+          allowRegister={view !== 'landing'}
           onSuccess={handleLogin}
           onClose={closeLogin}
         />
