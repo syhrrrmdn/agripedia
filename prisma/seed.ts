@@ -14,9 +14,9 @@ const adapter = new PrismaPg({ connectionString: process.env.DIRECT_URL ?? proce
 const prisma = new PrismaClient({ adapter });
 
 const SEED_USERS = [
-  { username: 'admin', nama: 'Admin Agripedia', role: 'admin', password: 'admin123' },
-  { username: 'penjual', nama: 'Pak Tani Penjual', role: 'penjual', password: 'penjual123' },
-  { username: 'buyer', nama: 'Bu Sari Pembeli', role: 'buyer', password: 'buyer123' },
+  { email: 'admin@gmail.com', nama: 'Admin Agripedia', role: 'admin', password: 'asdfghjkl' },
+  { email: 'penjual@gmail.com', nama: 'Pak Tani Penjual', role: 'penjual', password: 'asdfghjkl' },
+  { email: 'buyer@gmail.com', nama: 'Bu Sari Pembeli', role: 'buyer', password: 'asdfghjkl' },
 ];
 
 async function main() {
@@ -24,7 +24,7 @@ async function main() {
     for (const user of SEED_USERS) {
       await prisma.user.create({
         data: {
-          username: user.username,
+          email: user.email,
           nama: user.nama,
           role: user.role,
           passwordHash: hashPassword(user.password),

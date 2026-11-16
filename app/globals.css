@@ -57,13 +57,40 @@ body{font-family:var(--font-jakarta),Inter,ui-sans-serif,system-ui,sans-serif;ov
 .user-meta{display:flex;flex-direction:column;line-height:1.15}
 .user-meta strong{font-size:13px}
 .user-meta span{font-size:11px;color:var(--muted);font-weight:700}
-.login-reason{margin:0 0 14px;font-size:13px;color:#6d5a2d;background:#fff8e9;border:1px solid #f0e2bd;border-radius:12px;padding:10px 13px}
-.login-error{margin-bottom:14px;font-size:13px;color:#ad4036;background:#fcece5;border:1px solid #f3d3ca;border-radius:12px;padding:10px 13px}
-.demo-accounts{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;font-size:12px;color:var(--muted)}
-.demo-accounts strong{color:var(--ink)}
-.demo-account{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;margin-top:8px;background:#f6f9f3;border:1px solid var(--line);border-radius:12px;padding:9px 12px;text-align:left}
-.demo-account:hover{border-color:#6aab78;background:#eef7ea}
-.demo-account code{font-size:12px;font-weight:800;color:var(--green)}
-.demo-account span{font-size:11px;color:var(--muted)}
 .permission-note{margin-bottom:20px;font-size:13px;color:#6d5a2d;background:#fff8e9;border:1px solid #f0e2bd;border-radius:14px;padding:13px 16px}
+
+/* ---------- Autentikasi (login, daftar, lupa password) ---------- */
+.auth-backdrop{position:fixed;inset:0;background:linear-gradient(135deg,#10251de6 0%,#18372de6 100%);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50;backdrop-filter:blur(6px)}
+.auth-card{position:relative;background:#fff;border-radius:24px;width:min(440px,100%);max-height:94vh;overflow:auto;padding:30px 28px 26px;box-shadow:0 24px 64px #0b1a1466;animation:authPop .18s ease-out}
+@keyframes authPop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+.auth-close{position:absolute;top:14px;right:14px;border:0;background:#eaf4e8;border-radius:50%;width:36px;height:36px;font-size:22px;line-height:1;color:var(--green);display:grid;place-items:center}
+.auth-close:hover{background:#d8e9d2}
+.auth-brand{text-align:center;margin-bottom:20px}
+.auth-logo{display:inline-flex;align-items:center;gap:8px;font-weight:900;font-size:22px;letter-spacing:-.6px;color:var(--green);margin-bottom:6px}
+.auth-brand h1{margin:2px 0 4px;font-size:24px;letter-spacing:-.6px;color:var(--ink)}
+.auth-brand p{margin:0;font-size:13px;color:var(--muted)}
+.auth-form{display:flex;flex-direction:column;gap:14px}
+.auth-field{display:flex;flex-direction:column;gap:6px}
+.auth-field label{font-size:12px;font-weight:800;color:#4a5d54;letter-spacing:.2px}
+.auth-field input{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;outline:none;background:#fbfdfb;font-size:14px;transition:.15s}
+.auth-field input:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px #236b451f}
+.auth-hint{font-size:11px;color:var(--muted);margin-top:-2px}
+.auth-role{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.auth-role button{border:1.5px solid var(--line);background:#fbfdfb;border-radius:12px;padding:11px;font-weight:700;color:var(--muted);transition:.15s}
+.auth-role button:hover{border-color:#6aab78}
+.auth-role button.active{border-color:var(--green);background:var(--green);color:#fff}
+.auth-submit{border:0;border-radius:14px;background:linear-gradient(135deg,var(--green) 0%,#2e8a57 100%);color:#fff;padding:13px;font-weight:800;font-size:15px;letter-spacing:.2px;margin-top:4px;transition:.15s}
+.auth-submit:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.auth-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.auth-link{border:0;background:transparent;color:var(--green);font-weight:700;font-size:13px;padding:0;align-self:flex-start;text-decoration:none}
+.auth-link:hover{text-decoration:underline}
+.auth-link.inline{display:inline}
+.auth-switch{text-align:center;font-size:13px;color:var(--muted);margin:2px 0 0}
+.auth-alert{border-radius:12px;padding:11px 14px;font-size:13px;font-weight:600}
+.auth-alert.error{color:#ad4036;background:#fcece5;border:1px solid #f3d3ca}
+.auth-alert.success{color:#1e6b3a;background:#e8f6ec;border:1px solid #bfe3c7}
+.auth-newpass{margin-top:10px;padding:12px;border-radius:12px;background:#fff;border:1px dashed #bfe3c7;text-align:center}
+.auth-newpass strong{display:block;font-size:20px;letter-spacing:2px;color:var(--green);margin:4px 0}
+.auth-newpass span{display:block;font-size:11px;color:var(--muted);font-weight:500;margin-top:4px}
 @media(max-width:650px){.user-meta{display:none}.user-chip{padding:4px}}
+@media(max-width:370px){.auth-card{padding:24px 18px}}

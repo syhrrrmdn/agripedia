@@ -21,7 +21,7 @@ import DashboardView from '@/components/DashboardView';
 import EducationView from '@/components/EducationView';
 import Footer from '@/components/Footer';
 import GuideModal from '@/components/GuideModal';
-import LoginModal from '@/components/LoginModal';
+import AuthModal from '@/components/AuthModal';
 import ProductModal from '@/components/ProductModal';
 import ReadModal from '@/components/ReadModal';
 import Topbar from '@/components/Topbar';
@@ -387,7 +387,12 @@ export default function Page() {
       <ReadModal guide={readGuide} onClose={() => setReadId(null)} />
 
       {loginPrompt ? (
-        <LoginModal reason={loginPrompt.reason} onSuccess={handleLogin} onClose={closeLogin} />
+        <AuthModal
+          reason={loginPrompt.reason}
+          initialView={loginPrompt.initialView ?? 'login'}
+          onSuccess={handleLogin}
+          onClose={closeLogin}
+        />
       ) : null}
 
       <div className={`toast${toastVisible ? ' show' : ''}`} role="status" aria-live="polite">

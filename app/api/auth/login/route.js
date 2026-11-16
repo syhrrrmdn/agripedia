@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { SESSION_COOKIE, createSessionToken, sessionCookieOptions } from '@/lib/auth';
-import { getUserByUsername } from '@/lib/db';
+import { getUserByEmail } from '@/lib/db';
 import { verifyPassword } from '@/lib/password';
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request) {
   let body;
@@ -11,19 +13,22 @@ export async function POST(request) {
     body = {};
   }
 
-  const username = String(body.username ?? '').trim().toLowerCase();
+  const email = String(body.email ?? '').trim().toLowerCase();
   const password = String(body.password ?? '');
 
-  if (!username || !password) {
-    return NextResponse.json({ error: 'Nama pengguna dan password wajib diisi.' }, { status: 400 });
+  if (!email || !password) {
+    return NextResponse.json({ error: 'Email dan password wajib diisi.' }, { status: 400 });
+  }
+  if (!EMAIL_RE.test(email)) {
+    return NextResponse.json({ error: 'Format email tidak valid.' }, { status: 400 });
   }
 
-  const user = await getUserByUsername(username);
+  const user = await getUserByEmail(email);
   if (!user || !verifyPassword(password, user.passwordHash)) {
-    return NextResponse.json({ error: 'Nama pengguna atau password salah.' }, { status: 401 });
+    return NextResponse.json({ error: 'Email atau password salah.' }, { status: 401 });
   }
 
-  const session = { id: user.id, username: user.username, nama: user.nama, role: user.role };
+  const session = { id: user.id, email: user.email, nama: user.nama, role: user.role };
   const response = NextResponse.json({ user: session });
   response.cookies.set(SESSION_COOKIE, createSessionToken(session), sessionCookieOptions);
   return response;
