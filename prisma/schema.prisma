@@ -49,13 +49,19 @@ model Product {
 }
 
 model Order {
-  id        String   @id @default(cuid())
-  buyerId   Int      @map("buyer_id")
-  productId String   @map("product_id")
-  jumlah    Int      @default(1)
-  catatan   String   @default("")
-  status    String   @default("menunggu")
-  createdAt DateTime @default(now()) @map("created_at")
+  id            String   @id @default(cuid())
+  buyerId       Int      @map("buyer_id")
+  productId     String   @map("product_id")
+  jumlah        Int      @default(1)
+  catatan       String   @default("")
+  status        String   @default("menunggu")
+  metode        String   @default("whatsapp")
+  total         Int      @default(0)
+  alamat        String   @default("")
+  paymentStatus String   @default("unpaid") @map("payment_status")
+  paymentId     String   @default("") @map("payment_id")
+  snapToken     String   @default("") @map("snap_token")
+  createdAt     DateTime @default(now()) @map("created_at")
 
   buyer   User    @relation(fields: [buyerId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)

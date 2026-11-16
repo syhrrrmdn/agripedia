@@ -19,7 +19,9 @@ import {
   saveWaNumber,
   updateGuide,
   updateProduct,
+  updateOrderStatus,
 } from '@/lib/api';
+import { buildDirectWhatsAppLink } from '@/lib/format';
 import CatalogView from '@/components/CatalogView';
 import DashboardView from '@/components/DashboardView';
 import EducationView from '@/components/EducationView';
@@ -186,7 +188,7 @@ export default function Page() {
 
   const openOrder = useCallback(
     (product) => {
-      const buka = () => setOrderModal({ product: product ?? null });
+      const buka = () => setOrderModal({ product: product ?? null, waNumber });
       if (!user) {
         openLogin('Masuk sebagai pembeli untuk membuat pesanan.', buka);
         return;
@@ -197,7 +199,7 @@ export default function Page() {
       }
       buka();
     },
-    [user, openLogin, notify],
+    [user, openLogin, notify, waNumber],
   );
 
   const openGuide = useCallback(
@@ -265,11 +267,61 @@ export default function Page() {
   /* ---- Pesanan pembeli ---- */
 
   const saveOrder = async (values) => {
+    const { _product, metode, ...orderPayload } = values;
     try {
-      await createOrder(values);
-      setOrders(await listOrders());
-      setOrderModal(null);
-      notify('Pesanan tersimpan. Hubungi penjual lewat tab Pesanan saya.');
+      const response = await createOrder(orderPayload);
+
+      if (metode === 'whatsapp' && _product) {
+        // Build WhatsApp link and open it
+        const sellerWa = _product.penjual?.waNumber || waNumber;
+        if (sellerWa) {
+          const waLink = buildDirectWhatsAppLink(
+            sellerWa,
+            _product,
+            orderPayload.jumlah,
+            orderPayload.catatan,
+            orderPayload.alamat,
+          );
+          window.open(waLink, '_blank', 'noopener,noreferrer');
+        }
+        setOrders(await listOrders());
+        setOrderModal(null);
+        notify('Pesanan tersimpan! WhatsApp terbuka di tab baru.');
+      } else if (metode === 'online' && response.snapToken) {
+        // Trigger Midtrans Snap popup
+        if (typeof window !== 'undefined' && window.snap) {
+          window.snap.pay(response.snapToken, {
+            onSuccess: async () => {
+              setOrders(await listOrders());
+              setOrderModal(null);
+              notify('Pembayaran berhasil! Pesanan sedang diproses.');
+            },
+            onPending: async () => {
+              setOrders(await listOrders());
+              setOrderModal(null);
+              notify('Pembayaran tertunda. Selesaikan pembayaran sebelum batas waktu.');
+            },
+            onError: async () => {
+              setOrders(await listOrders());
+              notify('Pembayaran gagal. Silakan coba lagi dari tab Pesanan.');
+            },
+            onClose: async () => {
+              setOrders(await listOrders());
+              setOrderModal(null);
+              notify('Popup pembayaran ditutup. Lanjutkan dari tab Pesanan Saya.');
+            },
+          });
+        } else {
+          setOrders(await listOrders());
+          setOrderModal(null);
+          notify('Pesanan tersimpan. Sistem pembayaran sedang dimuat, coba bayar dari tab Pesanan.');
+        }
+      } else {
+        // Fallback
+        setOrders(await listOrders());
+        setOrderModal(null);
+        notify('Pesanan tersimpan.');
+      }
     } catch (error) {
       notify(error.message);
     }
@@ -284,6 +336,35 @@ export default function Page() {
       notify('Pesanan dibatalkan.');
     } catch (error) {
       notify(error.message);
+    }
+  };
+
+  const payOrder = async (order) => {
+    if (!order.snapToken) {
+      notify('Token pembayaran tidak ditemukan.');
+      return;
+    }
+    if (typeof window !== 'undefined' && window.snap) {
+      window.snap.pay(order.snapToken, {
+        onSuccess: async () => {
+          setOrders(await listOrders());
+          notify('Pembayaran berhasil! Pesanan sedang diproses.');
+        },
+        onPending: async () => {
+          setOrders(await listOrders());
+          notify('Pembayaran tertunda. Selesaikan pembayaran sebelum batas waktu.');
+        },
+        onError: async () => {
+          setOrders(await listOrders());
+          notify('Pembayaran gagal. Silakan coba lagi.');
+        },
+        onClose: async () => {
+          setOrders(await listOrders());
+          notify('Popup pembayaran ditutup.');
+        },
+      });
+    } else {
+      notify('Sistem pembayaran Midtrans belum siap dimuat.');
     }
   };
 
@@ -452,6 +533,7 @@ export default function Page() {
             onReset={resetDemo}
             onOrder={openOrder}
             onDeleteOrder={removeOrder}
+            onPayOrder={payOrder}
             onAddProduct={() => setProductModal({ product: null })}
             onEditProduct={(product) => setProductModal({ product })}
             onDeleteProduct={deleteProduct}

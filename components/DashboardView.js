@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { computeStats, productPhoto } from '@/lib/data';
-import { buildOrderWhatsAppLink, formatNumber, formatRupiah, waStatusText } from '@/lib/format';
+import { buildOrderWhatsAppLink, buildDirectWhatsAppLink, formatNumber, formatRupiah, waStatusText } from '@/lib/format';
 import { roleLabel } from '@/lib/roles';
 
 const JUDUL = {
@@ -98,6 +98,7 @@ export default function DashboardView({
   onDeleteGuide,
   onOrder,
   onDeleteOrder,
+  onPayOrder,
 }) {
   const role = user?.role ?? 'buyer';
   const isAdmin = role === 'admin';
@@ -377,7 +378,7 @@ export default function DashboardView({
             <div>
               <h2>Pesanan Saya</h2>
               <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>
-                Pesanan tersimpan di akun Anda. Lanjutkan proses pembelian dengan menghubungi penjual via WhatsApp.
+                Pesanan tersimpan di akun Anda. Bayar online atau hubungi penjual via WhatsApp.
               </div>
             </div>
             <button type="button" className="btn" onClick={() => onOrder(null)} disabled={products.length === 0}>
@@ -398,8 +399,11 @@ export default function DashboardView({
           ) : (
             <div className="order-list">
               {orders.map((order) => {
-                const total = (order.product?.harga ?? 0) * order.jumlah;
+                const total = order.total ?? (order.product?.harga ?? 0) * order.jumlah;
                 const orderPhoto = order.product ? productPhoto(order.product) : null;
+                const isWhatsapp = order.metode === 'whatsapp';
+                const isOnline = order.metode === 'online';
+                const payStatus = order.paymentStatus ?? 'unpaid';
                 return (
                   <div className="order-card" key={order.id}>
                     <div className="order-card-main">
@@ -422,7 +426,8 @@ export default function DashboardView({
                       <div className="order-product">
                         <div className="order-product-name">{order.product?.nama ?? 'Produk dihapus'}</div>
                         {order.product?.asal ? <div className="order-product-origin">📍 {order.product.asal}</div> : null}
-                        {order.catatan ? <div className="order-note">Catatan: {order.catatan}</div> : null}
+                        {order.alamat ? <div className="order-note">🏠 {order.alamat}</div> : null}
+                        {order.catatan ? <div className="order-note">📝 {order.catatan}</div> : null}
                       </div>
                       <div className="order-qty">
                         <span className="order-qty-num">{formatNumber(order.jumlah)}</span>
@@ -443,6 +448,24 @@ export default function DashboardView({
                           </span>
                         </div>
                       </div>
+                      <div className="order-badges">
+                        {/* Method Badge */}
+                        <span className={`method-badge ${isWhatsapp ? 'wa' : isOnline ? 'online' : ''}`}>
+                          {isWhatsapp ? '💬 WhatsApp' : isOnline ? '💳 Online' : '📋 Standar'}
+                        </span>
+                        {/* Payment Status Badge */}
+                        <span className={`payment-badge status-${payStatus}`}>
+                          {payStatus === 'paid'
+                            ? '✅ Sudah Dibayar'
+                            : payStatus === 'pending'
+                            ? '⏳ Menunggu Bayar'
+                            : payStatus === 'failed'
+                            ? '❌ Gagal'
+                            : payStatus === 'manual'
+                            ? '📱 Bayar Manual (COD)'
+                            : '🔔 Belum Bayar'}
+                        </span>
+                      </div>
                       <div className="order-total">
                         <span className="order-total-label">Total Pembelian</span>
                         <span className="order-total-value">{formatRupiah(total)}</span>
@@ -451,7 +474,44 @@ export default function DashboardView({
                     <div className="order-card-actions">
                       <span className={`order-status status-${order.status}`}>{order.status}</span>
                       <div className="order-actions">
-                        {order.product ? (
+                        {/* WhatsApp: Chat Penjual */}
+                        {isWhatsapp && order.product ? (
+                          <a
+                            className="btn secondary small chat-wa-btn"
+                            href={buildDirectWhatsAppLink(
+                              order.product.penjual?.waNumber || waNumber,
+                              order.product,
+                              order.jumlah,
+                              order.catatan,
+                              order.alamat,
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 15, height: 15 }}>
+                              <path d="M21 11.5a8 8 0 0 1-11.7 7.2L4 20.5l1.8-5.2A8 8 0 1 1 21 11.5z" />
+                            </svg>
+                            Chat Penjual di WhatsApp
+                          </a>
+                        ) : null}
+
+                        {/* Online: Bayar Sekarang (if pending/unpaid) */}
+                        {isOnline && (payStatus === 'pending' || payStatus === 'unpaid') && order.snapToken && onPayOrder ? (
+                          <button
+                            className="btn small pay-now-btn"
+                            type="button"
+                            onClick={() => onPayOrder(order)}
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 15, height: 15 }}>
+                              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                              <line x1="1" y1="10" x2="23" y2="10" />
+                            </svg>
+                            Bayar Sekarang
+                          </button>
+                        ) : null}
+
+                        {/* Old WA fallback for orders without metode */}
+                        {!isWhatsapp && !isOnline && order.product ? (
                           <a
                             className="btn secondary small chat-wa-btn"
                             href={buildOrderWhatsAppLink(
@@ -468,9 +528,13 @@ export default function DashboardView({
                             Chat Penjual di WhatsApp
                           </a>
                         ) : null}
-                        <button className="btn danger small" type="button" onClick={() => onDeleteOrder(order)}>
-                          Batalkan
-                        </button>
+
+                        {/* Cancel button only if not already paid */}
+                        {payStatus !== 'paid' ? (
+                          <button className="btn danger small" type="button" onClick={() => onDeleteOrder(order)}>
+                            Batalkan
+                          </button>
+                        ) : null}
                       </div>
                     </div>
                   </div>
