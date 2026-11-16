@@ -115,6 +115,15 @@ body{font-family:var(--font-jakarta),Inter,ui-sans-serif,system-ui,sans-serif;ov
 @media(max-width:650px){.user-meta{display:none}.user-chip{padding:4px}}
 @media(max-width:370px){.auth-card{padding:24px 18px}}
 
+/* ---------- Halaman katalog ---------- */
+.catalog-page{padding:46px 0 50px}
+.catalog-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:26px}
+.catalog-head h1{margin:8px 0 8px;font-size:clamp(26px,3.4vw,38px);letter-spacing:-1px;line-height:1.12}
+.catalog-head .muted{margin:0;max-width:560px}
+.catalog-count{display:flex;flex-direction:column;align-items:center;line-height:1;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 22px;box-shadow:0 3px 12px #193b2a08}
+.catalog-count strong{font-size:30px;color:var(--green);letter-spacing:-1px}
+.catalog-count span{font-size:12px;color:var(--muted);font-weight:700;margin-top:3px}
+
 /* ---------- Landing page ---------- */
 .brand-btn{border:0;background:transparent;padding:0;font-family:inherit;text-align:left}
 .landing{display:block;padding-bottom:26px}

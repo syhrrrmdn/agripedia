@@ -1,7 +1,4 @@
 import { CATEGORY_OPTIONS, SORT_OPTIONS } from '@/lib/data';
-import HeroCarousel from './HeroCarousel';
-import StatsBand from './StatsBand';
-import SolutionCards from './SolutionCards';
 import ProductCard from './ProductCard';
 import RegionBand from './RegionBand';
 
@@ -18,28 +15,22 @@ export default function CatalogView({
   kategori,
   onKategori,
   onOrder,
-  onQuickFilter,
-  onOpenEducation,
   onPickRegion,
 }) {
   return (
-    <section id="catalogView">
-      <HeroCarousel onQuickFilter={onQuickFilter} onOpenEducation={onOpenEducation} />
-      <StatsBand stats={stats} />
-
-      <div className="center">
-        <div className="eyebrow">Jelajahi Agripedia</div>
-        <h2>Dari lahan dan pesisir ke meja Anda</h2>
-        <p>Pilih kategori, atau pelajari dulu cara budidayanya.</p>
-      </div>
-      <SolutionCards onQuickFilter={onQuickFilter} onOpenEducation={onOpenEducation} />
-
-      <div className="center" id="produk">
-        <div className="eyebrow">Katalog</div>
-        <h2>Produk dari petani dan pembudidaya</h2>
-        <p>
-          <span>{products.length} produk</span> ditampilkan
-        </p>
+    <section id="catalogView" className="catalog-page">
+      <div className="catalog-head">
+        <div>
+          <div className="eyebrow">Katalog</div>
+          <h1>Produk dari petani dan pembudidaya</h1>
+          <p className="muted">
+            {stats.total} produk dari {stats.provinsi} provinsi. Cari, filter, lalu pesan langsung ke penjual.
+          </p>
+        </div>
+        <div className="catalog-count">
+          <strong>{products.length}</strong>
+          <span>produk tampil</span>
+        </div>
       </div>
 
       <div className="toolbar">
