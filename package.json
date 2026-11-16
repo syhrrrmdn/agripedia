@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "db:push": "prisma db push",
+    "db:drop": "tsx prisma/drop.ts",
+    "db:reset": "npm run db:drop && prisma db push && prisma db seed",
     "db:seed": "prisma db seed",
     "db:generate": "prisma generate",
     "postinstall": "prisma generate"
