@@ -1,0 +1,63 @@
+// AgriPedia — skema database (Supabase PostgreSQL) untuk Prisma ORM 7.
+// Catatan: URL koneksi TIDAK ditulis di sini, melainkan di prisma.config.ts
+// (Prisma 7 memindahkan datasource url ke prisma.config.ts).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  nama         String
+  role         String
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
+
+model Product {
+  id        String   @id @default(cuid())
+  nama      String
+  kategori  String   @default("Pertanian")
+  harga     Int      @default(0)
+  stok      Int      @default(0)
+  asal      String   @default("")
+  satuan    String   @default("")
+  deskripsi String   @default("")
+  imageUrl  String   @default("") @map("image_url")
+  unggulan  Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("products")
+}
+
+model Guide {
+  id        String   @id @default(cuid())
+  judul     String
+  kategori  String   @default("Pertanian")
+  tingkat   String   @default("Pemula")
+  topik     String   @default("")
+  ringkasan String   @default("")
+  langkah   String[]
+  tips      String   @default("")
+  imageUrl  String   @default("") @map("image_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("guides")
+}
+
+model Setting {
+  key   String @id
+  value String @default("")
+
+  @@map("settings")
+}
