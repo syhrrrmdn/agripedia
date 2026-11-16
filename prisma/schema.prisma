@@ -17,7 +17,11 @@ model User {
   nama         String
   role         String
   passwordHash String   @map("password_hash")
+  waNumber     String   @default("") @map("wa_number")
   createdAt    DateTime @default(now()) @map("created_at")
+
+  products Product[]
+  orders   Order[]
 
   @@map("users")
 }
@@ -33,10 +37,31 @@ model Product {
   deskripsi String   @default("")
   imageUrl  String   @default("") @map("image_url")
   unggulan  Boolean  @default(false)
+  penjualId Int?     @map("penjual_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  penjual User?   @relation(fields: [penjualId], references: [id], onDelete: SetNull)
+  orders  Order[]
+
+  @@index([penjualId])
   @@map("products")
+}
+
+model Order {
+  id        String   @id @default(cuid())
+  buyerId   Int      @map("buyer_id")
+  productId String   @map("product_id")
+  jumlah    Int      @default(1)
+  catatan   String   @default("")
+  status    String   @default("menunggu")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  buyer   User    @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([buyerId])
+  @@map("orders")
 }
 
 model Guide {

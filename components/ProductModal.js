@@ -12,6 +12,7 @@ const EMPTY_FORM = {
   asal: '',
   deskripsi: '',
   unggulan: false,
+  penjualId: '',
 };
 
 function initialForm(product) {
@@ -26,10 +27,11 @@ function initialForm(product) {
     asal: product.asal || '',
     deskripsi: product.deskripsi || '',
     unggulan: Boolean(product.unggulan),
+    penjualId: product.penjualId ? String(product.penjualId) : '',
   };
 }
 
-export default function ProductModal({ product, onSave, onClose, notify }) {
+export default function ProductModal({ product, penjualOptions = [], showPenjual = false, onSave, onClose, notify }) {
   const [form, setForm] = useState(() => initialForm(product));
 
   const setField = (key) => (event) =>
@@ -46,6 +48,11 @@ export default function ProductModal({ product, onSave, onClose, notify }) {
       notify(hasil.message);
       document.getElementById(hasil.field)?.focus();
       return;
+    }
+
+    // Pemilik produk hanya dikirim admin; penjual otomatis menjadi pemiliknya di server.
+    if (showPenjual) {
+      hasil.value.penjualId = form.penjualId === '' ? null : Number(form.penjualId);
     }
 
     onSave(hasil.value);
@@ -106,6 +113,20 @@ export default function ProductModal({ product, onSave, onClose, notify }) {
               onChange={setField('stok')}
             />
           </div>
+          {showPenjual ? (
+            <div className="field">
+              <label htmlFor="penjualId">Penjual pemilik produk</label>
+              <select id="penjualId" value={form.penjualId} onChange={setField('penjualId')}>
+                <option value="">Belum ada pemilik</option>
+                {penjualOptions.map((penjual) => (
+                  <option key={penjual.id} value={penjual.id}>
+                    {penjual.nama}
+                    {penjual.waNumber ? ` (+${penjual.waNumber})` : ' (nomor WA belum diisi)'}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
           <div className="field">
             <label htmlFor="satuan">Satuan jual</label>
             <input

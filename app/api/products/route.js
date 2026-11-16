@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { authorize, createProduct, listProducts } from '@/lib/db';
+import { authorize, createProduct, getUserById, listProducts } from '@/lib/db';
 import { validateProduct } from '@/lib/data';
 
 export async function GET() {
@@ -11,8 +11,21 @@ export async function GET() {
   }
 }
 
+/** Menentukan pemilik produk: penjual selalu dirinya sendiri, admin memilih dari daftar. */
+async function resolveOwner(user, body) {
+  if (user.role === 'penjual') return { penjualId: user.id };
+  if (body.penjualId === null || body.penjualId === undefined || body.penjualId === '') {
+    return { penjualId: null };
+  }
+  const owner = await getUserById(body.penjualId);
+  if (!owner || owner.role !== 'penjual') {
+    return { error: 'Penjual yang dipilih tidak ditemukan.' };
+  }
+  return { penjualId: owner.id };
+}
+
 export async function POST(request) {
-  const { response } = await authorize(['admin', 'penjual']);
+  const { user, response } = await authorize(['admin', 'penjual']);
   if (response) return response;
 
   const body = await request.json().catch(() => ({}));
@@ -21,8 +34,14 @@ export async function POST(request) {
     return NextResponse.json({ error: hasil.message, field: hasil.field }, { status: 400 });
   }
 
+  const owner = await resolveOwner(user, body);
+  if (owner.error) {
+    return NextResponse.json({ error: owner.error, field: 'penjualId' }, { status: 400 });
+  }
+
   try {
-    return NextResponse.json({ product: await createProduct(hasil.value) }, { status: 201 });
+    const product = await createProduct({ ...hasil.value, penjualId: owner.penjualId });
+    return NextResponse.json({ product }, { status: 201 });
   } catch (error) {
     console.error('POST /api/products gagal:', error);
     return NextResponse.json({ error: 'Gagal menyimpan produk.' }, { status: 500 });

@@ -21,6 +21,7 @@ export default function ProductCard({ product, onOrder }) {
         <div className="category">{product.kategori}</div>
         <h3>{product.nama}</h3>
         {product.asal ? <div className="origin">{product.asal}</div> : null}
+        {product.penjual ? <div className="origin">Penjual: {product.penjual.nama}</div> : null}
         <p className="desc">{product.deskripsi || 'Produk UMKM lokal pilihan.'}</p>
         <div className="price">
           {formatRupiah(product.harga)}
@@ -28,7 +29,7 @@ export default function ProductCard({ product, onOrder }) {
         </div>
         <div className="stock">Stok tersedia: {product.stok}</div>
         <button type="button" className="btn" onClick={() => onOrder(product)}>
-          Pesan via WhatsApp
+          Pesan produk
         </button>
       </div>
     </article>

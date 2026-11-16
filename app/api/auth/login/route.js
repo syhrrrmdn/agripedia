@@ -29,7 +29,7 @@ export async function POST(request) {
   }
 
   const session = { id: user.id, email: user.email, nama: user.nama, role: user.role };
-  const response = NextResponse.json({ user: session });
+  const response = NextResponse.json({ user: { ...session, waNumber: user.waNumber ?? '' } });
   response.cookies.set(SESSION_COOKIE, createSessionToken(session), sessionCookieOptions);
   return response;
 }

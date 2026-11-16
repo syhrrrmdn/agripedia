@@ -4,24 +4,29 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { computeHomeStats, filterGuides, filterProducts, sortProducts } from '@/lib/data';
 import {
   createGuide,
+  createOrder,
   createProduct,
   deleteGuide as deleteGuideApi,
+  deleteOrder as deleteOrderApi,
   deleteProduct as deleteProductApi,
   getWaNumber,
   listGuides,
+  listOrders,
   listProducts,
+  listUsers,
   resetDemo as resetDemoData,
+  saveProfileWa,
   saveWaNumber,
   updateGuide,
   updateProduct,
 } from '@/lib/api';
-import { buildWhatsAppLink } from '@/lib/format';
 import CatalogView from '@/components/CatalogView';
 import DashboardView from '@/components/DashboardView';
 import EducationView from '@/components/EducationView';
 import Footer from '@/components/Footer';
 import GuideModal from '@/components/GuideModal';
 import AuthModal from '@/components/AuthModal';
+import OrderModal from '@/components/OrderModal';
 import ProductModal from '@/components/ProductModal';
 import ReadModal from '@/components/ReadModal';
 import Topbar from '@/components/Topbar';
@@ -31,6 +36,8 @@ export default function Page() {
   const [products, setProducts] = useState([]);
   const [guides, setGuides] = useState([]);
   const [waNumber, setWaNumber] = useState('');
+  const [users, setUsers] = useState([]);
+  const [orders, setOrders] = useState([]);
 
   // Autentikasi
   const [user, setUser] = useState(null);
@@ -50,6 +57,7 @@ export default function Page() {
   // Modal & toast
   const [productModal, setProductModal] = useState(null);
   const [guideModal, setGuideModal] = useState(null);
+  const [orderModal, setOrderModal] = useState(null);
   const [readId, setReadId] = useState(null);
   const [toast, setToast] = useState('');
   const [toastVisible, setToastVisible] = useState(false);
@@ -86,6 +94,32 @@ export default function Page() {
   }, []);
 
   useEffect(() => () => clearTimeout(toastTimer.current), []);
+
+  // Muat data pendukung sesuai peran: daftar penjual untuk admin, pesanan untuk pembeli.
+  useEffect(() => {
+    let active = true;
+    if (user?.role === 'admin') {
+      listUsers()
+        .then((data) => {
+          if (active) setUsers(data);
+        })
+        .catch(() => {});
+    } else {
+      setUsers([]);
+    }
+    if (user?.role === 'buyer') {
+      listOrders()
+        .then((data) => {
+          if (active) setOrders(data);
+        })
+        .catch(() => {});
+    } else {
+      setOrders([]);
+    }
+    return () => {
+      active = false;
+    };
+  }, [user]);
 
   const notify = useCallback((message) => {
     setToast(message);
@@ -129,15 +163,10 @@ export default function Page() {
     notify('Anda telah keluar.');
   }, [notify]);
 
-  const canManageProducts = Boolean(user && (user.role === 'admin' || user.role === 'penjual'));
-  const canManageGuides = Boolean(user && user.role === 'admin');
-  const canManageWa = canManageGuides;
-  const canReset = canManageGuides;
-
   const navigate = useCallback(
     (nextView) => {
       if (nextView === 'dashboard' && !user) {
-        openLogin('Masuk untuk membuka dashboard pengelola.', () => {
+        openLogin('Masuk untuk membuka dashboard Anda.', () => {
           setView('dashboard');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         });
@@ -149,17 +178,20 @@ export default function Page() {
     [user, openLogin],
   );
 
-  const orderProduct = useCallback(
+  const openOrder = useCallback(
     (product) => {
+      const buka = () => setOrderModal({ product: product ?? null });
       if (!user) {
-        openLogin('Masuk dulu untuk memesan produk lewat WhatsApp.', () => {
-          window.open(buildWhatsAppLink(waNumber, product), '_blank', 'noopener,noreferrer');
-        });
+        openLogin('Masuk sebagai pembeli untuk membuat pesanan.', buka);
         return;
       }
-      window.open(buildWhatsAppLink(waNumber, product), '_blank', 'noopener,noreferrer');
+      if (user.role !== 'buyer') {
+        notify('Hanya akun pembeli yang dapat membuat pesanan.');
+        return;
+      }
+      buka();
     },
-    [user, waNumber, openLogin],
+    [user, openLogin, notify],
   );
 
   const openGuide = useCallback(
@@ -216,6 +248,31 @@ export default function Page() {
     }
   };
 
+  /* ---- Pesanan pembeli ---- */
+
+  const saveOrder = async (values) => {
+    try {
+      await createOrder(values);
+      setOrders(await listOrders());
+      setOrderModal(null);
+      notify('Pesanan tersimpan. Hubungi penjual lewat tab Pesanan saya.');
+    } catch (error) {
+      notify(error.message);
+    }
+  };
+
+  const removeOrder = async (order) => {
+    const namaProduk = order.product?.nama ?? 'ini';
+    if (!window.confirm(`Batalkan pesanan "${namaProduk}"?`)) return;
+    try {
+      await deleteOrderApi(order.id);
+      setOrders(await listOrders());
+      notify('Pesanan dibatalkan.');
+    } catch (error) {
+      notify(error.message);
+    }
+  };
+
   /* ---- Edukasi ---- */
 
   const saveGuide = async (values) => {
@@ -246,6 +303,19 @@ export default function Page() {
   };
 
   /* ---- Nomor WhatsApp ---- */
+
+  /** Nomor WhatsApp milik sendiri (admin/penjual) — dipakai pembeli saat memesan produknya. */
+  const saveMyWa = async (raw) => {
+    try {
+      const updated = await saveProfileWa(String(raw ?? '').trim());
+      if (updated) setUser((prev) => (prev ? { ...prev, waNumber: updated.waNumber ?? '' } : prev));
+      notify('Nomor WhatsApp Anda tersimpan.');
+      return true;
+    } catch (error) {
+      notify(error.message);
+      return false;
+    }
+  };
 
   const saveWa = async (raw) => {
     try {
@@ -280,6 +350,7 @@ export default function Page() {
       if (event.key !== 'Escape') return;
       setProductModal(null);
       setGuideModal(null);
+      setOrderModal(null);
       setReadId(null);
       closeLogin();
     };
@@ -304,7 +375,7 @@ export default function Page() {
         view={view}
         user={user}
         onNavigate={navigate}
-        onLogin={() => openLogin('Masuk untuk mengelola katalog dan edukasi.')}
+        onLogin={() => openLogin('Masuk ke akun AgriPedia Anda.')}
         onLogout={handleLogout}
       />
 
@@ -320,7 +391,7 @@ export default function Page() {
             onSort={setSort}
             kategori={kategori}
             onKategori={setKategori}
-            onOrder={orderProduct}
+            onOrder={openOrder}
             onQuickFilter={quickFilter}
             onOpenEducation={() => navigate('education')}
             onPickRegion={pickRegion}
@@ -343,15 +414,16 @@ export default function Page() {
         {view === 'dashboard' ? (
           <DashboardView
             user={user}
-            canManageProducts={canManageProducts}
-            canManageGuides={canManageGuides}
-            canManageWa={canManageWa}
-            canReset={canReset}
+            users={users}
+            orders={orders}
             products={products}
             guides={guides}
             waNumber={waNumber}
             onSaveWa={saveWa}
+            onSaveMyWa={saveMyWa}
             onReset={resetDemo}
+            onOrder={openOrder}
+            onDeleteOrder={removeOrder}
             onAddProduct={() => setProductModal({ product: null })}
             onEditProduct={(product) => setProductModal({ product })}
             onDeleteProduct={deleteProduct}
@@ -368,8 +440,21 @@ export default function Page() {
         <ProductModal
           key={productModal.product?.id ?? 'new-product'}
           product={productModal.product}
+          penjualOptions={users.filter((item) => item.role === 'penjual')}
+          showPenjual={user?.role === 'admin'}
           onSave={saveProduct}
           onClose={() => setProductModal(null)}
+          notify={notify}
+        />
+      ) : null}
+
+      {orderModal ? (
+        <OrderModal
+          key={orderModal.product?.id ?? 'new-order'}
+          product={orderModal.product}
+          products={products}
+          onSave={saveOrder}
+          onClose={() => setOrderModal(null)}
           notify={notify}
         />
       ) : null}
