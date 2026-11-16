@@ -22,6 +22,37 @@ function namaPenjual(product) {
     : `${product.penjual.nama} · nomor WA belum diisi`;
 }
 
+const STAT_ICONS = {
+  store: (
+    <>
+      <path d="M3 9l1.5-5h15L21 9" />
+      <path d="M4 9v11h16V9" />
+      <path d="M9 20v-6h6v6" />
+    </>
+  ),
+  people: (
+    <>
+      <circle cx="9" cy="8" r="3.2" />
+      <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" />
+      <path d="M16 11a3 3 0 1 0 0-6" />
+      <path d="M21 20c0-2.5-1.8-4.5-4-5" />
+    </>
+  ),
+  tag: (
+    <>
+      <path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z" />
+      <circle cx="7.5" cy="7.5" r="1.3" />
+    </>
+  ),
+  cart: (
+    <>
+      <circle cx="9" cy="20" r="1.4" />
+      <circle cx="18" cy="20" r="1.4" />
+      <path d="M2 3h2l2.5 12.5a2 2 0 0 0 2 1.5h8.5a2 2 0 0 0 2-1.6L21 7H6" />
+    </>
+  ),
+};
+
 export default function DashboardView({
   user,
   users,
@@ -80,12 +111,14 @@ export default function DashboardView({
     onSaveMyWa(myWaInput);
   };
 
+  const jumlahPenjual = new Set(products.map((p) => p.penjualId).filter(Boolean)).size;
+
   const kartu = isBuyer
     ? [
-        ['TOTAL PRODUK', formatNumber(products.length)],
-        ['JUMLAH PENJUAL', formatNumber(new Set(products.map((p) => p.penjualId).filter(Boolean)).size)],
-        ['KATEGORI', formatNumber(stats.kategori)],
-        ['PESANAN SAYA', formatNumber(orders.length)],
+        { label: 'Produk tersedia', value: formatNumber(products.length), icon: 'store', tone: 'green' },
+        { label: 'Penjual aktif', value: formatNumber(jumlahPenjual), icon: 'people', tone: 'orange' },
+        { label: 'Kategori', value: formatNumber(stats.kategori), icon: 'tag', tone: 'blue' },
+        { label: 'Pesanan saya', value: formatNumber(orders.length), icon: 'cart', tone: 'lime' },
       ]
     : [
         ['TOTAL PRODUK', formatNumber(stats.total)],
@@ -125,14 +158,32 @@ export default function DashboardView({
         </div>
       </div>
 
-      <div className="stats">
-        {kartu.map(([label, value]) => (
-          <div className="stat" key={label}>
-            <div className="stat-label">{label}</div>
-            <div className="stat-value">{value}</div>
-          </div>
-        ))}
-      </div>
+      {isBuyer ? (
+        <div className="stats buyer-stats">
+          {kartu.map((item) => (
+            <div className={`buyer-stat tone-${item.tone}`} key={item.label}>
+              <div className="buyer-stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  {STAT_ICONS[item.icon]}
+                </svg>
+              </div>
+              <div className="buyer-stat-text">
+                <div className="buyer-stat-value">{item.value}</div>
+                <div className="buyer-stat-label">{item.label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="stats">
+          {kartu.map(([label, value]) => (
+            <div className="stat" key={label}>
+              <div className="stat-label">{label}</div>
+              <div className="stat-value">{value}</div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="chips" role="tablist" aria-label="Bagian dashboard">
         {(isBuyer ? ['katalog', 'pesanan'] : ['produk', 'edukasi']).map((key) => (
@@ -150,64 +201,71 @@ export default function DashboardView({
       </div>
 
       {tab === 'katalog' ? (
-        <div className="panel">
+        <div className="panel buyer-panel">
           <div className="panel-head">
             <div>
               <h2>Katalog dan penjual</h2>
               <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>
-                Setiap produk punya penjual sendiri, jadi tombol pesan diarahkan ke nomor WhatsApp penjualnya.
+                Setiap produk punya penjual sendiri, jadi pesanan langsung diarahkan ke nomor WhatsApp penjualnya.
               </div>
             </div>
           </div>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Produk</th>
-                  <th>Penjual</th>
-                  <th>Harga</th>
-                  <th>Stok</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="empty">
-                      Belum ada produk yang bisa dipesan.
-                    </td>
-                  </tr>
-                ) : (
-                  products.map((product) => (
-                    <tr key={product.id}>
-                      <td>
-                        <strong>{product.nama}</strong>
-                        {product.asal ? (
-                          <>
-                            <br />
-                            <span className="muted">{product.asal}</span>
-                          </>
-                        ) : null}
-                      </td>
-                      <td>{namaPenjual(product)}</td>
-                      <td>{formatRupiah(product.harga)}</td>
-                      <td>{formatNumber(product.stok)}</td>
-                      <td>
-                        <button className="btn small" type="button" onClick={() => onOrder(product)}>
-                          Pesan
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+          {products.length === 0 ? (
+            <div className="empty-block">
+              <div className="empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 9l1.5-5h15L21 9" />
+                  <path d="M4 9v11h16V9" />
+                  <path d="M9 20v-6h6v6" />
+                </svg>
+              </div>
+              <p>Belum ada produk yang bisa dipesan.</p>
+            </div>
+          ) : (
+            <div className="buyer-product-grid">
+              {products.map((product) => (
+                <div className="buyer-product" key={product.id}>
+                  <div className="buyer-product-top">
+                    <div className="buyer-product-cat">{product.kategori}</div>
+                    <div className={`buyer-product-stock${product.stok > 0 ? ' ok' : ' out'}`}>
+                      {product.stok > 0 ? `${formatNumber(product.stok)} ${product.satuan}` : 'Habis'}
+                    </div>
+                  </div>
+                  <div className="buyer-product-name">{product.nama}</div>
+                  <div className="buyer-product-origin">
+                    {product.asal ? `• ${product.asal}` : ''}
+                  </div>
+                  <div className="buyer-product-price">{formatRupiah(product.harga)}</div>
+                  <div className="buyer-product-seller">
+                    <div className="seller-avatar">
+                      {(product.penjual?.nama ?? '?').slice(0, 1).toUpperCase()}
+                    </div>
+                    <div className="seller-info">
+                      <strong>{product.penjual?.nama ?? 'Belum ada penjual'}</strong>
+                      <span>
+                        {product.penjual?.waNumber
+                          ? `+${product.penjual.waNumber}`
+                          : 'nomor WA belum diisi'}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    className="btn small buyer-order-btn"
+                    type="button"
+                    onClick={() => onOrder(product)}
+                    disabled={product.stok <= 0}
+                  >
+                    Pesan
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       ) : null}
 
       {tab === 'pesanan' ? (
-        <div className="panel">
+        <div className="panel buyer-panel">
           <div className="panel-head">
             <div>
               <h2>Pesanan saya</h2>
@@ -219,71 +277,79 @@ export default function DashboardView({
               Buat pesanan
             </button>
           </div>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Produk</th>
-                  <th>Penjual</th>
-                  <th>Jumlah</th>
-                  <th>Perkiraan total</th>
-                  <th>Status</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="empty">
-                      Belum ada pesanan. Pilih produk pada tab Katalog &amp; penjual.
-                    </td>
-                  </tr>
-                ) : (
-                  orders.map((order) => (
-                    <tr key={order.id}>
-                      <td>
-                        <strong>{order.product?.nama ?? 'Produk dihapus'}</strong>
-                        {order.catatan ? (
-                          <>
-                            <br />
-                            <span className="muted">{order.catatan}</span>
-                          </>
-                        ) : null}
-                      </td>
-                      <td>{order.product ? namaPenjual(order.product) : '—'}</td>
-                      <td>
-                        {formatNumber(order.jumlah)}
-                        {order.product?.satuan ? ` ${order.product.satuan}` : ''}
-                      </td>
-                      <td>{formatRupiah((order.product?.harga ?? 0) * order.jumlah)}</td>
-                      <td>{order.status}</td>
-                      <td>
-                        <div className="actions">
-                          {order.product ? (
-                            <a
-                              className="btn secondary small"
-                              href={buildOrderWhatsAppLink(
-                                order.product.penjual?.waNumber || waNumber,
-                                order.product,
-                                order.jumlah,
-                              )}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              Chat penjual
-                            </a>
-                          ) : null}
-                          <button className="btn danger small" type="button" onClick={() => onDeleteOrder(order)}>
-                            Batalkan
-                          </button>
+          {orders.length === 0 ? (
+            <div className="empty-block">
+              <div className="empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="9" cy="20" r="1.4" />
+                  <circle cx="18" cy="20" r="1.4" />
+                  <path d="M2 3h2l2.5 12.5a2 2 0 0 0 2 1.5h8.5a2 2 0 0 0 2-1.6L21 7H6" />
+                </svg>
+              </div>
+              <p>Belum ada pesanan. Pilih produk pada tab Katalog &amp; penjual.</p>
+            </div>
+          ) : (
+            <div className="order-list">
+              {orders.map((order) => {
+                const total = (order.product?.harga ?? 0) * order.jumlah;
+                return (
+                  <div className="order-card" key={order.id}>
+                    <div className="order-card-main">
+                      <div className="order-product">
+                        <div className="order-product-name">{order.product?.nama ?? 'Produk dihapus'}</div>
+                        {order.catatan ? <div className="order-note">Catatan: {order.catatan}</div> : null}
+                      </div>
+                      <div className="order-qty">
+                        <span className="order-qty-num">{formatNumber(order.jumlah)}</span>
+                        <span className="order-qty-unit">{order.product?.satuan ?? 'item'}</span>
+                      </div>
+                    </div>
+                    <div className="order-card-meta">
+                      <div className="order-seller">
+                        <div className="seller-avatar sm">
+                          {(order.product?.penjual?.nama ?? '?').slice(0, 1).toUpperCase()}
                         </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                        <div>
+                          <strong>{order.product?.penjual?.nama ?? '—'}</strong>
+                          <span>
+                            {order.product?.penjual?.waNumber
+                              ? `+${order.product.penjual.waNumber}`
+                              : 'nomor WA belum diisi'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="order-total">
+                        <span className="order-total-label">Total</span>
+                        <span className="order-total-value">{formatRupiah(total)}</span>
+                      </div>
+                    </div>
+                    <div className="order-card-actions">
+                      <span className={`order-status status-${order.status}`}>{order.status}</span>
+                      <div className="order-actions">
+                        {order.product ? (
+                          <a
+                            className="btn secondary small"
+                            href={buildOrderWhatsAppLink(
+                              order.product.penjual?.waNumber || waNumber,
+                              order.product,
+                              order.jumlah,
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Chat penjual
+                          </a>
+                        ) : null}
+                        <button className="btn danger small" type="button" onClick={() => onDeleteOrder(order)}>
+                          Batalkan
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       ) : null}
 
