@@ -287,3 +287,208 @@ body{font-family:var(--font-jakarta),Inter,ui-sans-serif,system-ui,sans-serif;ov
 .order-actions{display:flex;gap:8px;flex-wrap:wrap}
 @media(max-width:900px){.buyer-stats{grid-template-columns:repeat(2,1fr)}.buyer-product-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:650px){.buyer-stats{grid-template-columns:repeat(2,1fr);gap:10px}.buyer-stat{padding:12px;gap:10px}.buyer-stat-icon{width:40px;height:40px;flex-basis:40px}.buyer-stat-value{font-size:21px}.buyer-product-grid{grid-template-columns:1fr}.order-card-main{flex-direction:column;align-items:stretch}.order-qty{flex-direction:row;min-width:0;justify-content:center;gap:8px}.order-qty-num{font-size:18px}}
+
+
+/* ---------- Dashboard Banner ---------- */
+.dash-banner{padding:38px 0 32px;color:#fff;position:relative;overflow:hidden}
+.dash-banner.admin{background:linear-gradient(135deg,#0c4a26 0%,#145c30 50%,#0e5228 100%)}
+.dash-banner.penjual{background:linear-gradient(135deg,#0c4a26 0%,#177a3c 55%,#c87620 100%)}
+.dash-banner.buyer{background:linear-gradient(135deg,#146b34 0%,#1e8c48 50%,#26a355 100%)}
+.dash-banner-inner{max-width:1180px;margin:auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.dash-banner-user{display:flex;align-items:center;gap:16px}
+.dash-avatar-badge{width:58px;height:58px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800;font-size:22px;flex:0 0 58px;border:3px solid #ffffff40}
+.dash-role-badge{display:inline-block;font-size:12px;font-weight:700;background:#ffffff26;color:#fff;padding:3px 12px;border-radius:999px;margin-top:4px}
+.dash-title{margin:0;font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.6px;line-height:1.2;color:#fff}
+.dash-desc{margin:4px 0 0;font-size:14px;color:#d6eed8;max-width:540px}
+.dash-banner-actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.dash-action-btn{border:0;border-radius:999px;padding:9px 18px;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:7px;cursor:pointer;transition:filter .15s,transform .15s;background:#ffffff24;color:#fff}
+.dash-action-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.dash-action-btn svg{width:16px;height:16px}
+.dash-action-btn.primary{background:#fff;color:var(--green)}
+.dash-action-btn.primary:hover{background:#f0f8ee}
+.dash-action-btn.ghost{background:#ffffff18;color:#fff;border:1px solid #ffffff30}
+.dash-action-btn.ghost:hover{background:#ffffff2e}
+
+/* ---------- Admin KPI Grid ---------- */
+.admin-kpi-grid{grid-template-columns:repeat(5,1fr)}
+
+/* ---------- Buyer stat additions ---------- */
+.buyer-stat-sub{font-size:11px;color:var(--muted);font-weight:600;margin-top:1px}
+.buyer-stat.tone-purple .buyer-stat-icon{background:#efe5f6;color:#7c3aad}
+
+/* ---------- Dashboard Tabs ---------- */
+.dash-tabs{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap}
+.dash-tab-btn{border:1px solid var(--line);background:#fff;padding:9px 18px;border-radius:999px;color:var(--muted);font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:7px;cursor:pointer;transition:.15s}
+.dash-tab-btn:hover{border-color:#b8d6b6;color:var(--ink)}
+.dash-tab-btn.active{background:var(--green);border-color:var(--green);color:#fff}
+.tab-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;font-size:11px;font-weight:800;background:#ffffff30;color:#fff;line-height:1}
+.dash-tab-btn:not(.active) .tab-badge{background:var(--lime);color:var(--green)}
+
+/* ---------- Admin Panel & Filter ---------- */
+.admin-panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 3px 12px #193b2a08}
+.admin-table-filter{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.admin-filter-search{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 14px;flex:1;min-width:200px}
+.admin-filter-search svg{width:16px;height:16px;color:var(--muted);flex:0 0 16px}
+.admin-filter-search input{border:0;outline:none;background:transparent;font-size:13px;flex:1;min-width:0}
+.admin-filter-kategori{display:flex;gap:6px;flex-wrap:wrap}
+.admin-filter-pill{border:1px solid var(--line);background:#fff;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:.15s}
+.admin-filter-pill:hover{border-color:#b8d6b6;color:var(--ink)}
+.admin-filter-pill.active{background:var(--green);border-color:var(--green);color:#fff}
+
+/* ---------- Admin Table ---------- */
+.admin-table{border-collapse:collapse;width:100%;min-width:650px}
+.admin-table th,.admin-table td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);font-size:13px}
+.admin-table th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.7px}
+.admin-table-row{transition:background .12s}
+.admin-table-row:hover{background:#f5faf3}
+.admin-product-thumb{width:48px;height:48px;border-radius:10px;overflow:hidden;background:var(--lime);flex:0 0 48px;display:grid;place-items:center;position:relative}
+.admin-product-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.admin-product-thumb.sea{background:linear-gradient(135deg,#e4f1f4,#fff5ed)}
+.admin-product-thumb.nophoto img{display:none}
+.admin-product-thumb.nophoto .thumb-fallback{display:block}
+.thumb-fallback{display:none;font-size:24px;line-height:1}
+.admin-product-title{display:flex;flex-direction:column;gap:2px}
+.admin-product-title strong{font-size:14px}
+.admin-product-origin{font-size:12px;color:var(--muted)}
+
+/* ---------- Admin Seller Cell ---------- */
+.admin-seller-cell{display:flex;align-items:center;gap:10px}
+.admin-seller-avatar{width:30px;height:30px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800;font-size:12px;flex:0 0 30px}
+.admin-seller-name{font-weight:700;font-size:13px}
+.admin-seller-wa{font-size:12px;color:var(--green);font-weight:600}
+.admin-seller-no-wa{font-size:12px;color:var(--orange);font-weight:600;font-style:italic}
+
+/* ---------- Badges ---------- */
+.badge-kategori{display:inline-block;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.4px}
+.badge-kategori.pertanian{background:#eaf4e8;color:#236b45}
+.badge-kategori.perikanan{background:#e0f0f4;color:#1b6e82}
+.badge-kategori.kearifan{background:#fef3e2;color:#96600c}
+.badge-stok{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800}
+.badge-stok.ok{background:#eaf4e8;color:var(--green)}
+.badge-stok.low{background:#fff5e6;color:#a06c20}
+.badge-stok.empty{background:#fcece5;color:#ad4036}
+.badge-featured{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800;background:#fff6dc;color:#8c5e10}
+.badge-level{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800}
+.badge-level.pemula{background:#eaf4e8;color:var(--green)}
+.badge-level.menengah{background:#fff5e6;color:#a06c20}
+.badge-level.lanjutan{background:#fcece5;color:#ad4036}
+
+/* ---------- Admin Misc ---------- */
+.admin-price{font-weight:850;color:var(--green);font-size:14px}
+.admin-unit{font-size:12px;color:var(--muted);font-weight:600;margin-left:2px}
+.admin-notice{display:flex;align-items:center;gap:10px;font-size:13px;color:#6d5a2d;background:#fff8e9;border:1px solid #f0e2bd;border-radius:14px;padding:12px 16px;margin-bottom:16px}
+.admin-notice svg{width:18px;height:18px;flex:0 0 18px;color:#c89620}
+.admin-guide-title{display:flex;flex-direction:column;gap:4px}
+.admin-guide-title strong{font-size:14px}
+.admin-guide-title span{font-size:11px;color:var(--muted);font-weight:600}
+.admin-step-pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800;background:var(--lime);color:var(--green)}
+
+/* ---------- Admin Seller Table ---------- */
+.admin-seller-profile-cell{display:flex;align-items:center;gap:10px}
+.seller-sub-badge{display:inline-block;font-size:10px;font-weight:700;background:#eaf4e8;color:var(--green);padding:2px 8px;border-radius:999px;margin-top:2px}
+.admin-email-text{font-size:13px;color:var(--ink)}
+.admin-wa-active{font-size:13px;color:var(--green);font-weight:700}
+.admin-wa-empty{font-size:12px;color:var(--orange);font-style:italic}
+.admin-product-count-badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:24px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:800;background:var(--lime);color:var(--green)}
+
+/* ---------- WhatsApp & Chat ---------- */
+.wa-brand-pill{display:inline-flex;align-items:center;gap:7px;background:#25d366;color:#fff;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:700}
+.wa-brand-pill svg{width:16px;height:16px}
+.chat-wa-btn{border:0;border-radius:999px;background:#25d366;color:#fff;padding:8px 16px;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:7px;cursor:pointer;transition:.15s}
+.chat-wa-btn:hover{background:#1fb855}
+.chat-wa-btn svg{width:16px;height:16px}
+.chat-wa-link{border:0;background:transparent;color:#25d366;font-weight:700;font-size:13px;padding:0;display:inline-flex;align-items:center;gap:5px;cursor:pointer;text-decoration:none}
+.chat-wa-link:hover{text-decoration:underline}
+.chat-wa-link svg{width:14px;height:14px}
+
+/* ---------- Product Fallback ---------- */
+.product-fallback-icon{display:none;font-size:48px;line-height:1}
+.nophoto .product-fallback-icon{display:block}
+.order-photo-fallback{display:none;font-size:28px;line-height:1}
+.nophoto .order-photo-fallback{display:block}
+
+/* ---------- Table Actions ---------- */
+.table-actions-end{display:flex;gap:7px;justify-content:flex-end;align-items:center}
+.action-edit-btn{border:0;border-radius:10px;background:#eaf4e8;color:var(--green);padding:7px 13px;font-weight:700;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:.12s}
+.action-edit-btn:hover{background:#d8e9d2}
+.action-del-btn{border:0;border-radius:10px;background:#fcece5;color:#ad4036;padding:7px 13px;font-weight:700;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:.12s}
+.action-del-btn:hover{background:#f5d6cd}
+
+/* ---------- Navbar Auth Group ---------- */
+.nav-auth-group{display:flex;align-items:center;gap:8px}
+
+/* ---------- Price Unit ---------- */
+.price-unit{font-size:12px;color:var(--muted);font-weight:600}
+
+/* ---------- Responsive: Dashboard ---------- */
+@media(max-width:1100px){.admin-kpi-grid{grid-template-columns:repeat(3,1fr)}.dash-banner-inner{flex-direction:column;align-items:flex-start;gap:16px}}
+@media(max-width:900px){.admin-kpi-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.admin-kpi-grid{grid-template-columns:1fr}.dash-banner{padding:28px 0 24px}.dash-banner-inner{padding:0 16px}.dash-banner-actions{width:100%}.dash-action-btn{flex:1;justify-content:center}.admin-table-filter{flex-direction:column;align-items:stretch}.admin-filter-search{min-width:0}.admin-product-thumb{width:40px;height:40px;flex-basis:40px;border-radius:8px}.admin-product-thumb .thumb-fallback{font-size:20px}}
+
+
+/* ---------- Enhanced Auth Modal & Components ---------- */
+.auth-card-animated{animation:authFadeScale .22s cubic-bezier(.16,1,.3,1)}
+@keyframes authFadeScale{from{opacity:0;transform:scale(.95) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+.auth-close-enhanced{position:absolute;top:16px;right:16px;border:0;background:#eaf4e8;border-radius:50%;width:36px;height:36px;color:var(--green);display:grid;place-items:center;cursor:pointer;transition:background .15s,transform .15s}
+.auth-close-enhanced:hover{background:#d8e9d2;transform:rotate(90deg)}
+.auth-close-enhanced svg{width:18px;height:18px}
+
+.auth-brand{position:relative;text-align:center;margin-bottom:20px}
+.auth-brand-deco{position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:140px;height:70px;background:radial-gradient(ellipse at center,#177a3c20 0%,transparent 70%);pointer-events:none;z-index:0}
+.auth-logo{display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:23px;letter-spacing:-.6px;color:var(--green);position:relative;z-index:1}
+.auth-logo-icon{font-size:22px}
+.auth-view-icon{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#eaf5e7,#d8edd3);color:var(--green);display:grid;place-items:center;margin:10px auto 8px;box-shadow:0 4px 14px #177a3c22}
+.auth-view-icon svg{width:22px;height:22px}
+
+.auth-view-container{animation:authViewIn .2s ease-out}
+@keyframes authViewIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.auth-input-wrap{position:relative;display:flex;align-items:center;width:100%}
+.auth-input-icon{position:absolute;left:13px;display:grid;place-items:center;color:var(--muted);pointer-events:none;z-index:1}
+.auth-input-icon svg{width:18px;height:18px}
+.auth-field input.has-icon{padding-left:42px !important}
+
+.auth-pw-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:transparent;border:0;padding:6px;color:var(--muted);cursor:pointer;display:grid;place-items:center;border-radius:8px;transition:color .15s,background .15s}
+.auth-pw-toggle:hover{color:var(--ink);background:#eef5ec}
+.auth-pw-toggle svg{width:18px;height:18px}
+
+.auth-pw-strength{display:flex;align-items:center;gap:8px;margin-top:-4px;margin-bottom:2px}
+.auth-pw-strength-bar{flex:1;height:5px;background:#e5eee3;border-radius:99px;overflow:hidden}
+.auth-pw-strength-fill{height:100%;border-radius:99px;transition:width .25s ease,background .25s ease}
+.auth-pw-strength-label{font-size:11px;font-weight:800;min-width:44px;text-align:right}
+
+.auth-pw-match{font-size:12px;font-weight:700;margin-top:-4px;margin-bottom:2px;display:flex;align-items:center;gap:6px}
+.auth-pw-match.match{color:var(--green)}
+.auth-pw-match.no-match{color:#ad4036}
+.auth-pw-match-icon{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#eaf4e8;color:var(--green)}
+.auth-pw-match-icon svg{width:11px;height:11px}
+
+.auth-role{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.auth-role button{display:flex;align-items:center;gap:10px;padding:12px 14px;text-align:left;border:1.5px solid var(--line);border-radius:14px;background:#fbfdfb;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s}
+.auth-role button:hover{border-color:#6aab78;background:#f4faf2}
+.auth-role button.active{border-color:var(--green);background:#eaf4e8;box-shadow:0 0 0 2px #177a3c26}
+.auth-role-emoji{font-size:22px;flex:0 0 24px;line-height:1}
+.auth-role-content{display:flex;flex-direction:column;line-height:1.25}
+.auth-role-content strong{font-size:13px;color:var(--ink)}
+.auth-role button.active .auth-role-content strong{color:var(--green)}
+.auth-role-content small{font-size:11px;color:var(--muted)}
+
+.auth-forgot-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--green);text-decoration:none;margin-top:-4px}
+.auth-forgot-link:hover{text-decoration:underline}
+.auth-forgot-link svg{width:14px;height:14px}
+
+.auth-divider{display:flex;align-items:center;text-align:center;margin:10px 0 4px;color:var(--muted);font-size:12px;font-weight:600}
+.auth-divider::before,.auth-divider::after{content:"";flex:1;border-bottom:1px solid var(--line)}
+.auth-divider span{padding:0 12px;text-transform:lowercase;letter-spacing:.3px}
+
+.auth-spinner{display:inline-block;width:15px;height:15px;border:2px solid #ffffff50;border-top-color:#fff;border-radius:50%;animation:authSpin .6s linear infinite}
+@keyframes authSpin{to{transform:rotate(360deg)}}
+
+.auth-result-block{text-align:center;padding:18px 16px}
+.auth-result-icon{width:46px;height:46px;border-radius:50%;background:#d0edd7;color:var(--green);display:grid;place-items:center;margin:0 auto 6px}
+.auth-result-icon svg{width:24px;height:24px}
+.auth-copy-btn{display:inline-flex;align-items:center;gap:6px;border:0;background:#eaf4e8;color:var(--green);padding:7px 15px;border-radius:999px;font-size:12px;font-weight:800;cursor:pointer;margin:8px auto 6px;transition:background .15s}
+.auth-copy-btn:hover{background:#d6ecd0}
+.auth-copy-btn svg{width:14px;height:14px}
+.auth-newpass-label{display:block;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px}

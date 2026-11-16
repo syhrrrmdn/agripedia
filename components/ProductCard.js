@@ -10,10 +10,14 @@ export default function ProductCard({ product, onOrder }) {
   return (
     <article className="product">
       <div className={`product-visual ${variant}${broken ? ' nophoto' : ''}`}>
-        {broken ? null : (
+        {broken ? (
+          <div className="product-fallback-icon" aria-hidden="true">
+            {product.kategori === 'Perikanan' ? '🐟' : '🌾'}
+          </div>
+        ) : (
           <img src={photo.url} alt={product.nama} loading="lazy" onError={() => setBroken(true)} />
         )}
-        {photo.ilustrasi ? <span className="credit">Foto ilustrasi</span> : null}
+        {photo.ilustrasi && !broken ? <span className="credit">Foto ilustrasi</span> : null}
         <span className="tag">{product.kategori}</span>
         {product.unggulan ? <span className="tag featured">Unggulan</span> : null}
       </div>

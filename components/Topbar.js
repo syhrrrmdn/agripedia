@@ -16,7 +16,7 @@ function initialsOf(nama) {
     .join('');
 }
 
-export default function Topbar({ view, user, onNavigate, onLogin, onLogout }) {
+export default function Topbar({ view, user, onNavigate, onLogin, onRegister, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -128,9 +128,14 @@ export default function Topbar({ view, user, onNavigate, onLogin, onLogout }) {
               ) : null}
             </div>
           ) : (
-            <button type="button" className="btn small" onClick={onLogin}>
-              Masuk
-            </button>
+            <div className="nav-auth-group">
+              <button type="button" className="btn small secondary" onClick={onLogin}>
+                Masuk
+              </button>
+              <button type="button" className="btn small orange" onClick={onRegister}>
+                Daftar
+              </button>
+            </div>
           )}
         </div>
       </div>

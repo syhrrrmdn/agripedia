@@ -7,7 +7,13 @@ export default function GuideCard({ guide, onRead }) {
   return (
     <article className="product">
       <div className={`product-visual${broken ? ' nophoto' : ''}`}>
-        {broken ? null : <img src={guidePhoto(guide)} alt={guide.judul} loading="lazy" onError={() => setBroken(true)} />}
+        {broken ? (
+          <span style={{ fontSize: 48 }} aria-hidden="true">
+            {guide.kategori === 'Perikanan' ? '🐟' : guide.kategori === 'Kearifan Lokal' ? '🏛️' : '🌾'}
+          </span>
+        ) : (
+          <img src={guidePhoto(guide)} alt={guide.judul} loading="lazy" onError={() => setBroken(true)} />
+        )}
         <span className="tag">{guide.tingkat}</span>
       </div>
       <div className="product-body">

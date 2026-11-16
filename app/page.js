@@ -131,9 +131,14 @@ export default function Page() {
 
   /* ---- Autentikasi ---- */
 
-  const openLogin = useCallback((reason, action) => {
+  const openLogin = useCallback((reason, action, initialView = 'login') => {
     pendingAction.current = action ?? null;
-    setLoginPrompt({ reason });
+    setLoginPrompt({ reason, initialView });
+  }, []);
+
+  const openRegister = useCallback((reason, action) => {
+    pendingAction.current = action ?? null;
+    setLoginPrompt({ reason: reason ?? 'Daftar akun baru di AgriPedia.', initialView: 'register' });
   }, []);
 
   const closeLogin = useCallback(() => {
@@ -385,6 +390,7 @@ export default function Page() {
         user={user}
         onNavigate={navigate}
         onLogin={() => openLogin('Masuk ke akun AgriPedia Anda.')}
+        onRegister={() => openRegister('Daftar akun baru di AgriPedia.')}
         onLogout={handleLogout}
       />
 
@@ -497,7 +503,7 @@ export default function Page() {
         <AuthModal
           reason={loginPrompt.reason}
           initialView={loginPrompt.initialView ?? 'login'}
-          allowRegister={view !== 'landing'}
+          allowRegister={true}
           onSuccess={handleLogin}
           onClose={closeLogin}
         />

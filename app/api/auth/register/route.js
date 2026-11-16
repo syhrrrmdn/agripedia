@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { SESSION_COOKIE, createSessionToken, sessionCookieOptions } from '@/lib/auth';
 import { createUser, getUserByEmail } from '@/lib/db';
 import { hashPassword } from '@/lib/password';
 
@@ -44,8 +45,11 @@ export async function POST(request) {
     passwordHash: hashPassword(password),
   });
 
-  return NextResponse.json(
-    { user: { id: user.id, email: user.email, nama: user.nama, role: user.role } },
+  const session = { id: user.id, email: user.email, nama: user.nama, role: user.role };
+  const response = NextResponse.json(
+    { user: { ...session, waNumber: user.waNumber ?? '' } },
     { status: 201 },
   );
+  response.cookies.set(SESSION_COOKIE, createSessionToken(session), sessionCookieOptions);
+  return response;
 }
