@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { computeStats } from '@/lib/data';
+import { computeStats, productPhoto } from '@/lib/data';
 import { buildOrderWhatsAppLink, formatNumber, formatRupiah, waStatusText } from '@/lib/format';
 import { roleLabel } from '@/lib/roles';
 
@@ -223,42 +223,59 @@ export default function DashboardView({
             </div>
           ) : (
             <div className="buyer-product-grid">
-              {products.map((product) => (
-                <div className="buyer-product" key={product.id}>
-                  <div className="buyer-product-top">
-                    <div className="buyer-product-cat">{product.kategori}</div>
-                    <div className={`buyer-product-stock${product.stok > 0 ? ' ok' : ' out'}`}>
-                      {product.stok > 0 ? `${formatNumber(product.stok)} ${product.satuan}` : 'Habis'}
+              {products.map((product) => {
+                const photo = productPhoto(product);
+                const visualClass = product.kategori === 'Perikanan' ? 'sea' : Number(product.harga) > 60000 ? 'orange' : '';
+                return (
+                  <div className="buyer-product" key={product.id}>
+                    <div className={`buyer-product-visual ${visualClass}`}>
+                      <img
+                        src={photo.url}
+                        alt={product.nama}
+                        loading="lazy"
+                        onError={(event) => {
+                          event.currentTarget.style.display = 'none';
+                          event.currentTarget.parentElement.classList.add('nophoto');
+                        }}
+                      />
+                      {photo.ilustrasi ? <span className="credit">Foto ilustrasi</span> : null}
+                      {product.unggulan ? <span className="tag featured">Unggulan</span> : null}
                     </div>
-                  </div>
-                  <div className="buyer-product-name">{product.nama}</div>
-                  <div className="buyer-product-origin">
-                    {product.asal ? `• ${product.asal}` : ''}
-                  </div>
-                  <div className="buyer-product-price">{formatRupiah(product.harga)}</div>
-                  <div className="buyer-product-seller">
-                    <div className="seller-avatar">
-                      {(product.penjual?.nama ?? '?').slice(0, 1).toUpperCase()}
+                    <div className="buyer-product-top">
+                      <div className="buyer-product-cat">{product.kategori}</div>
+                      <div className={`buyer-product-stock${product.stok > 0 ? ' ok' : ' out'}`}>
+                        {product.stok > 0 ? `${formatNumber(product.stok)} ${product.satuan}` : 'Habis'}
+                      </div>
                     </div>
-                    <div className="seller-info">
-                      <strong>{product.penjual?.nama ?? 'Belum ada penjual'}</strong>
-                      <span>
-                        {product.penjual?.waNumber
-                          ? `+${product.penjual.waNumber}`
-                          : 'nomor WA belum diisi'}
-                      </span>
+                    <div className="buyer-product-name">{product.nama}</div>
+                    <div className="buyer-product-origin">
+                      {product.asal ? `• ${product.asal}` : ''}
                     </div>
+                    <div className="buyer-product-price">{formatRupiah(product.harga)}</div>
+                    <div className="buyer-product-seller">
+                      <div className="seller-avatar">
+                        {(product.penjual?.nama ?? '?').slice(0, 1).toUpperCase()}
+                      </div>
+                      <div className="seller-info">
+                        <strong>{product.penjual?.nama ?? 'Belum ada penjual'}</strong>
+                        <span>
+                          {product.penjual?.waNumber
+                            ? `+${product.penjual.waNumber}`
+                            : 'nomor WA belum diisi'}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      className="btn small buyer-order-btn"
+                      type="button"
+                      onClick={() => onOrder(product)}
+                      disabled={product.stok <= 0}
+                    >
+                      Pesan
+                    </button>
                   </div>
-                  <button
-                    className="btn small buyer-order-btn"
-                    type="button"
-                    onClick={() => onOrder(product)}
-                    disabled={product.stok <= 0}
-                  >
-                    Pesan
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -292,11 +309,26 @@ export default function DashboardView({
             <div className="order-list">
               {orders.map((order) => {
                 const total = (order.product?.harga ?? 0) * order.jumlah;
+                const orderPhoto = order.product ? productPhoto(order.product) : null;
                 return (
                   <div className="order-card" key={order.id}>
                     <div className="order-card-main">
+                      {orderPhoto ? (
+                        <div className="order-photo">
+                          <img
+                            src={orderPhoto.url}
+                            alt={order.product?.nama ?? 'produk'}
+                            loading="lazy"
+                            onError={(event) => {
+                              event.currentTarget.style.display = 'none';
+                              event.currentTarget.parentElement.classList.add('nophoto');
+                            }}
+                          />
+                        </div>
+                      ) : null}
                       <div className="order-product">
                         <div className="order-product-name">{order.product?.nama ?? 'Produk dihapus'}</div>
+                        {order.product?.asal ? <div className="order-product-origin">{order.product.asal}</div> : null}
                         {order.catatan ? <div className="order-note">Catatan: {order.catatan}</div> : null}
                       </div>
                       <div className="order-qty">
